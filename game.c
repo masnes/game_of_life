@@ -28,9 +28,9 @@ int main(int argc, char *argv[])
 
 void swap_pointers(char **a,char **b)
 {
-   char **temp = a;
+   char *temp = *a;
    *a = *b;
-   *b = *temp;
+   *b = temp;
 
    return;
 }
