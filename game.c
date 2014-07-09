@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-   int size = 16;
+   int size = 32;
    int sleep_duration = 1;
    int seed = 1;
    char lifeboard_a[size][size];
@@ -62,12 +62,12 @@ void swap_boards(char *primary_array, char *secondary_array, size_t array_size)
          num_neighbors = get_numberof_neighbors(primary_array, i, j, array_size);
          if (primary_array[i*array_size+j]) { // cell we're looking at is alive
             if (num_neighbors == 2 || num_neighbors == 3)
-               secondary_array[i*array_size+j] = 1;
+               secondary_array[i*array_size+j] = num_neighbors;
             else
                secondary_array[i*array_size+j] = 0;
          } else { // cell we're looking at is dead
             if (num_neighbors == 3)
-               secondary_array[i*array_size+j] = 1;
+               secondary_array[i*array_size+j] = num_neighbors;
             else
                secondary_array[i*array_size+j] = 0;
          }
