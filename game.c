@@ -84,26 +84,30 @@ int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
    int xmin = x - 1;
    int xmax = x + 1;
    int ymin = y - 1;
-   int ymax = x + 1;
+   int ymax = y + 1;
 
    int i, j;
    int neighbors = 0;
 
+   assert(x <= max && x >= 0);
+   assert(y <= max && y >= 0);
+
    // test for special cases with array boundries
    if (x == max)
-      xmax = x;
+      xmax = max;
    if (x == 0)
       xmin = 0;
    if (y == max)
-      ymax = y;
+      ymax = max;
    if (y == 0)
       ymin = 0;
 
    // Move through array between boundries, counting live cells
-   for (i = xmin; i < xmax; i++)
-      for (j = ymin; j < ymax; j++)
-         if ((i != 0 && j != 0) && array[i*array_size+j])
-            neighbors++;
+   for (i = xmin; i <= xmax; i++)
+      for (j = ymin; j <= ymax; j++)
+         if (!(i == x && j == y))
+            if (array[i*array_size+j])
+               neighbors++;
 
    return neighbors;
 }
@@ -112,12 +116,17 @@ void print_board(char *array, size_t array_size)
 {
    int i, j;
 
+   printf("\n");
+   printf("\n");
+
    for (i = 0; i < array_size; i++) {
-      for (j = 0; j < array_size; j++)
-         printf("%d", array[i*array_size+j]);
+      for (j = 0; j < array_size; j++) {
+         if (array[i*array_size+j])
+            printf(" %d", array[i*array_size+j]);
+         else
+            printf("  ");
+      }
       printf("\n");
    }
-   printf("\n");
-   printf("\n");
-   printf("\n");
+
 }

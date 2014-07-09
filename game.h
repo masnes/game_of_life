@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 
 void swap_pointers(char **a,char **b);
 void init_boards(char *primary_array, char *secondary_array, size_t array_size);
