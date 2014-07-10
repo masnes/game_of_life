@@ -1,10 +1,13 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
+#include <sys/ioctl.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 #include <assert.h>
 
 void swap_pointers(char **a,char **b);

@@ -4,24 +4,41 @@
 
 int main(int argc, char *argv[])
 {
-   int size = 32;
+   struct winsize w;
+   int size;
    int sleep_duration = 1;
    int seed = time(NULL);
-   char lifeboard_a[size][size];
-   char lifeboard_b[size][size];
-   char *primary_array = *lifeboard_a;
-   char *secondary_array = *lifeboard_b;
+   char **primary_array;
+   char **secondary_array;
+
+   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+   w.ws_row < w.ws_col ? (size = w.ws_row - sqrtl(w.ws_row)) : (size = w.ws_col);
+
+   char *lifeboard_a = malloc(sizeof(char) * size * size);
+   char *lifeboard_b = malloc(sizeof(char) * size * size);
+
+   if (lifeboard_a == NULL || lifeboard_b == NULL) {
+      fprintf(stderr, "Error: out of memory\n");
+      exit(1);
+   }
+
+   primary_array = &lifeboard_a;
+   secondary_array = &lifeboard_b;
 
    srandom(seed);
 
-   init_boards(*lifeboard_a, *lifeboard_b, size);
+   init_boards(lifeboard_a, lifeboard_b, size);
 
    while (1) {
-      print_board(primary_array, size);
-      swap_boards(primary_array, secondary_array, size);
-      swap_pointers(&primary_array, &secondary_array);
+      print_board(*primary_array, size);
+      swap_boards(*primary_array, *secondary_array, size);
+      swap_pointers(primary_array, secondary_array);
       sleep(sleep_duration);
    }
+
+   free(lifeboard_a);
+   free(lifeboard_b);
 
    return 0;
 }
