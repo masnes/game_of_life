@@ -1,6 +1,6 @@
 #include "game.h"
 
-//Note: live cells in the game are 1, dead are 0
+//Note: live cells in the game are >= 1, dead are 0
 
 int main(int argc, char *argv[])
 {
@@ -11,8 +11,12 @@ int main(int argc, char *argv[])
    char **primary_array;
    char **secondary_array;
 
+   srandom(seed);
+
+   // get window information
    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
+   // set size based on window info
    w.ws_row < w.ws_col ? (size = w.ws_row - sqrtl(w.ws_row)) : (size = w.ws_col);
 
    char *lifeboard_a = malloc(sizeof(char) * size * size);
@@ -25,8 +29,6 @@ int main(int argc, char *argv[])
 
    primary_array = &lifeboard_a;
    secondary_array = &lifeboard_b;
-
-   srandom(seed);
 
    init_boards(lifeboard_a, lifeboard_b, size);
 
@@ -53,7 +55,6 @@ void swap_pointers(char **a,char **b)
 }
 
 /* init_boards: init primary board with random numbers, secondary board all 0 */
-// DONE: make this work for any array size, not just 64*64
 void init_boards(char *primary_array, char *secondary_array, size_t array_size)
 {
    int i, j;
@@ -69,6 +70,7 @@ void init_boards(char *primary_array, char *secondary_array, size_t array_size)
          secondary_array[i*array_size+j] = 0;
 }
 
+/* swap_boards: using the state of primary_array, build secondary_array */
 void swap_boards(char *primary_array, char *secondary_array, size_t array_size)
 {
    int i, j;
@@ -129,6 +131,10 @@ int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
    return neighbors;
 }
 
+/*
+ * print_board: print board state as 2d "image"
+ * X's are alive, " "'s are dead.
+ */
 void print_board(char *array, size_t array_size)
 {
    int i, j;
