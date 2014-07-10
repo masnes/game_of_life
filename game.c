@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
    int size = 32;
    int sleep_duration = 1;
-   int seed = 1;
+   int seed = time(NULL);
    char lifeboard_a[size][size];
    char lifeboard_b[size][size];
    char *primary_array = *lifeboard_a;
@@ -80,7 +80,7 @@ void swap_boards(char *primary_array, char *secondary_array, size_t array_size)
 int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
 {
    // Array boundries
-   int max = array_size;
+   int max = array_size-1;
    int xmin = x - 1;
    int xmax = x + 1;
    int ymin = y - 1;
@@ -116,13 +116,13 @@ void print_board(char *array, size_t array_size)
 {
    int i, j;
 
-   printf("\n");
-   printf("\n");
+   for (i = 0; i < 10; i++)
+      printf("\n");
 
    for (i = 0; i < array_size; i++) {
       for (j = 0; j < array_size; j++) {
          if (array[i*array_size+j])
-            printf(" %d", array[i*array_size+j]);
+            printf(" X");
          else
             printf("  ");
       }
