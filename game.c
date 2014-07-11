@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
    struct winsize w;
-   int size;
+   int width, height;
    int sleep_duration = 1;
    int seed = time(NULL);
    char **primary_array;
@@ -17,10 +17,12 @@ int main(int argc, char *argv[])
    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
    // set size based on window info
-   w.ws_row < w.ws_col ? (size = w.ws_row - sqrtl(w.ws_row)) : (size = w.ws_col);
+   width = w.ws_col / HORIZONTALSPACING;
+   height = w.ws_row - 2;
 
-   char *lifeboard_a = malloc(sizeof(char) * size * size);
-   char *lifeboard_b = malloc(sizeof(char) * size * size);
+
+   char *lifeboard_a = malloc(sizeof(char) * width * height);
+   char *lifeboard_b = malloc(sizeof(char) * width * height);
 
    if (lifeboard_a == NULL || lifeboard_b == NULL) {
       fprintf(stderr, "Error: out of memory\n");
@@ -30,11 +32,11 @@ int main(int argc, char *argv[])
    primary_array = &lifeboard_a;
    secondary_array = &lifeboard_b;
 
-   init_boards(lifeboard_a, lifeboard_b, size);
+   init_boards(lifeboard_a, lifeboard_b, width, height);
 
    while (1) {
-      print_board(*primary_array, size);
-      swap_boards(*primary_array, *secondary_array, size);
+      print_board(*primary_array, width, height);
+      swap_boards(*primary_array, *secondary_array, width, height);
       swap_pointers(primary_array, secondary_array);
       sleep(sleep_duration);
    }
@@ -55,51 +57,51 @@ void swap_pointers(char **a,char **b)
 }
 
 /* init_boards: init primary board with random numbers, secondary board all 0 */
-void init_boards(char *primary_array, char *secondary_array, size_t array_size)
+void init_boards(char *primary_array, char *secondary_array, size_t width, size_t height)
 {
    int i, j;
 
    // init primary array
-   for (i = 0; i < array_size; i++)
-      for (j = 0; j < array_size; j++)
-         primary_array[i*array_size+j] = (char)(random() % 2);
+   for (i = 0; i < width; i++)
+      for (j = 0; j < height; j++)
+         primary_array[i*height+j] = (char)(random() % 2);
 
    // init secondary array
-   for (i = 0; i < array_size; i++)
-      for (j = 0; j < array_size; j++)
-         secondary_array[i*array_size+j] = 0;
+   for (i = 0; i < width; i++)
+      for (j = 0; j < height; j++)
+         secondary_array[i*height+j] = 0;
 }
 
 /* swap_boards: using the state of primary_array, build secondary_array */
-void swap_boards(char *primary_array, char *secondary_array, size_t array_size)
+void swap_boards(char *primary_array, char *secondary_array, size_t width, size_t height)
 {
    int i, j;
    int num_neighbors;
 
-   for (i = 0; i < array_size; i++)
-      for (j = 0; j < array_size; j++) {
-         num_neighbors = get_numberof_neighbors(primary_array, i, j, array_size);
-         if (primary_array[i*array_size+j]) { // cell we're looking at is alive
+   for (i = 0; i < height; i++)
+      for (j = 0; j < width; j++) {
+         num_neighbors = get_numberof_neighbors(primary_array, i, j, width, height);
+         if (primary_array[i*height+j]) { // cell we're looking at is alive
             if (num_neighbors == 2 || num_neighbors == 3)
-               secondary_array[i*array_size+j] = num_neighbors;
+               secondary_array[i*height+j] = num_neighbors;
             else
-               secondary_array[i*array_size+j] = 0;
+               secondary_array[i*height+j] = 0;
          } else { // cell we're looking at is dead
             if (num_neighbors == 3)
-               secondary_array[i*array_size+j] = num_neighbors;
+               secondary_array[i*height+j] = num_neighbors;
             else
-               secondary_array[i*array_size+j] = 0;
+               secondary_array[i*height+j] = 0;
          }
       }
 }
 
 
 /* get_numberof_neighbors: count the number of neighbors to cell at [x][y] */
-// DONE: make this work for any array size, not just 64*64
-int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
+int get_numberof_neighbors(char *array, int x, int y, size_t width, size_t height)
 {
    // Array boundries
-   int max = array_size-1;
+   int heightmax = height-1;
+   int widthmax = width-1;
    int xmin = x - 1;
    int xmax = x + 1;
    int ymin = y - 1;
@@ -108,16 +110,16 @@ int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
    int i, j;
    int neighbors = 0;
 
-   assert(x <= max && x >= 0);
-   assert(y <= max && y >= 0);
+   assert(x <= heightmax && x >= 0);
+   assert(y <= widthmax && y >= 0);
 
    // test for special cases with array boundries
-   if (x == max)
-      xmax = max;
+   if (x == heightmax)
+      xmax = heightmax;
    if (x == 0)
       xmin = 0;
-   if (y == max)
-      ymax = max;
+   if (y == widthmax)
+      ymax = widthmax;
    if (y == 0)
       ymin = 0;
 
@@ -125,7 +127,7 @@ int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
    for (i = xmin; i <= xmax; i++)
       for (j = ymin; j <= ymax; j++)
          if (!(i == x && j == y))
-            if (array[i*array_size+j])
+            if (array[i*height+j])
                neighbors++;
 
    return neighbors;
@@ -135,19 +137,23 @@ int get_numberof_neighbors(char *array, int x, int y, size_t array_size)
  * print_board: print board state as 2d "image"
  * X's are alive, " "'s are dead.
  */
-void print_board(char *array, size_t array_size)
+void print_board(char *array, size_t width, size_t height)
 {
-   int i, j;
+   int i, j, k;
 
    for (i = 0; i < 10; i++)
       printf("\n");
 
-   for (i = 0; i < array_size; i++) {
-      for (j = 0; j < array_size; j++) {
-         if (array[i*array_size+j])
-            printf(" X");
+   for (i = 0; i < height; i++) {
+      for (j = 0; j < width; j++) {
+         if (array[i*height+j]) {
+            for (k = 1; k < HORIZONTALSPACING; k++)
+               printf(" ");
+            printf("X");
+         }
          else
-            printf("  ");
+            for (k = 1; k <= HORIZONTALSPACING; k++)
+               printf(" ");
       }
       printf("\n");
    }
