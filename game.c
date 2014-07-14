@@ -5,11 +5,15 @@
 int main(int argc, char *argv[])
 {
    struct winsize w;
+   struct timespec tspec;
    int width, height;
-   int sleep_duration = 1;
    int seed = time(NULL);
    char **primary_array;
    char **secondary_array;
+   int sleep_seconds = 0;
+   int sleep_nanosecs = 150000000;
+   tspec.tv_sec = sleep_seconds;
+   tspec.tv_nsec = sleep_nanosecs;
 
    srandom(seed);
 
@@ -38,7 +42,7 @@ int main(int argc, char *argv[])
       print_board(*primary_array, width, height);
       swap_boards(*primary_array, *secondary_array, width, height);
       swap_pointers(primary_array, secondary_array);
-      sleep(sleep_duration);
+      nanosleep(&tspec, NULL);
    }
 
    free(lifeboard_a);
