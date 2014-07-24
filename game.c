@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
    while (1) {
       print_board(*primary_array, width, height);
-      swap_boards(*primary_array, *secondary_array, width, height);
+      process_and_swap_boards(*primary_array, *secondary_array, width, height);
       swap_pointers(primary_array, secondary_array);
       nanosleep(&tspec, NULL);
    }
@@ -76,8 +76,8 @@ void init_boards(char *primary_array, char *secondary_array, size_t width, size_
          secondary_array[i*height+j] = 0;
 }
 
-/* swap_boards: using the state of primary_array, build secondary_array */
-void swap_boards(char *primary_array, char *secondary_array, size_t width, size_t height)
+/* process_and_swap_boards: using the state of primary_array, build secondary_array */
+void process_and_swap_boards(char *primary_array, char *secondary_array, size_t width, size_t height)
 {
    int i, j;
    int num_neighbors;
