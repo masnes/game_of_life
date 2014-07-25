@@ -2,8 +2,8 @@
 
 //Note: live cells in the game are >= 1, dead are 0
 
-/* 
- * game.c (conways game of life): 
+/*
+ * game.c (conways game of life):
  * A board [array] is randomly populated with "living" or "dead" cells.
  * The array is then sent through subsequent iterations such that living cells
  * that previously had 2 or 3 living neighbors remain alive, and dead cells
