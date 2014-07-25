@@ -1,11 +1,10 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <sys/ioctl.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <time.h>
+#include <sys/ioctl.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 #include <math.h>
 #include <assert.h>
